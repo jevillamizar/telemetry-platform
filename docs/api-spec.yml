@@ -1,0 +1,39 @@
+# Contrato OpenAPI. Los paths se agregan con /cerrar al completar cada spec.
+openapi: 3.1.0
+info:
+  title: ColdChain Telemetry Platform API
+  version: 0.0.0
+  description: >
+    API multi-tenant de monitoreo de cadena de frío. El tenant activo se deduce
+    de la autenticación y la membresía; nunca se acepta tenant_id del cliente.
+servers:
+  - url: http://localhost:3000/api/v1
+    description: Local (no validado)
+security:
+  - bearerAuth: []
+tags: []
+paths: {}
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Token de usuario. El tenant activo viaja en el token.
+    deviceAuth:
+      type: http
+      scheme: bearer
+      description: Credencial de dispositivo para ingesta HTTP. El servidor deduce tenant y dispositivo.
+  schemas:
+    Error:
+      type: object
+      required: [statusCode, error, message, requestId]
+      properties:
+        statusCode:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        requestId:
+          type: string
