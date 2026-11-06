@@ -1,5 +1,5 @@
-import type { HealthCheckResult } from "./postgres.health";
-import { conTimeout } from "../with-timeout";
+import type { HealthCheckResult } from "./postgres.health.js";
+import { conTimeout } from "../with-timeout.js";
 
 export interface RedisPingable {
   ping(): Promise<string>;

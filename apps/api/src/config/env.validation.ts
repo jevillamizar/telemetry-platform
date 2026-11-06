@@ -17,6 +17,14 @@ class EnvironmentVariables {
   @IsOptional()
   @IsString()
   PORT?: string;
+
+  @IsOptional()
+  @IsString()
+  MQTT_SERVICE_USERNAME?: string;
+
+  @IsOptional()
+  @IsString()
+  MQTT_SERVICE_PASSWORD?: string;
 }
 
 export function validateEnv(config: Record<string, unknown>): EnvironmentVariables {

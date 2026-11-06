@@ -1,4 +1,4 @@
-import type { HealthCheckResult } from "./postgres.health";
+import type { HealthCheckResult } from "./postgres.health.js";
 
 export interface MqttConnectable {
   connected: boolean;

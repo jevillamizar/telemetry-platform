@@ -1,4 +1,6 @@
-import { validateEnv } from "../src/config/env.validation";
+import { describe, expect, it } from "@jest/globals";
+
+import { validateEnv } from "../src/config/env.validation.js";
 
 describe("validateEnv", () => {
   const configCompleta = {
@@ -27,9 +29,9 @@ describe("validateEnv", () => {
   });
 
   it("rechaza la configuración vacía sin imprimir valores en el mensaje", () => {
+    expect.assertions(4);
     try {
       validateEnv({});
-      fail("se esperaba que lanzara un error");
     } catch (error) {
       const mensaje = (error as Error).message;
       expect(mensaje).toMatch(/DATABASE_URL/);

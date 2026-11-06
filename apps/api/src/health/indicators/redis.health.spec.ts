@@ -1,8 +1,10 @@
-import { RedisHealthIndicator } from "./redis.health";
+import { describe, expect, it, jest } from "@jest/globals";
+
+import { RedisHealthIndicator } from "./redis.health.js";
 
 describe("RedisHealthIndicator", () => {
   it("responde up cuando el cliente resuelve PONG", async () => {
-    const clienteSimulado = { ping: jest.fn().mockResolvedValue("PONG") };
+    const clienteSimulado = { ping: jest.fn<() => Promise<string>>().mockResolvedValue("PONG") };
     const indicador = new RedisHealthIndicator(clienteSimulado);
 
     const resultado = await indicador.check();
@@ -13,7 +15,9 @@ describe("RedisHealthIndicator", () => {
 
   it("responde down cuando el cliente rechaza el ping", async () => {
     const clienteSimulado = {
-      ping: jest.fn().mockRejectedValue(new Error("ECONNREFUSED 10.0.0.6:6379")),
+      ping: jest
+        .fn<() => Promise<string>>()
+        .mockRejectedValue(new Error("ECONNREFUSED 10.0.0.6:6379")),
     };
     const indicador = new RedisHealthIndicator(clienteSimulado);
 
@@ -24,7 +28,7 @@ describe("RedisHealthIndicator", () => {
 
   it("responde down cuando el ping excede el timeout", async () => {
     const clienteSimulado = {
-      ping: jest.fn().mockImplementation(() => new Promise(() => {})),
+      ping: jest.fn<() => Promise<string>>().mockImplementation(() => new Promise(() => {})),
     };
     const indicador = new RedisHealthIndicator(clienteSimulado);
 

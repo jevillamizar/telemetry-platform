@@ -1,4 +1,4 @@
-import { conTimeout } from "../with-timeout";
+import { conTimeout } from "../with-timeout.js";
 
 export interface PostgresQueryable {
   query(sql: string): Promise<unknown>;

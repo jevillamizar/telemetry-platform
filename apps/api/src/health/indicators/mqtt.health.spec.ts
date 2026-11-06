@@ -1,4 +1,6 @@
-import { MqttHealthIndicator } from "./mqtt.health";
+import { describe, expect, it } from "@jest/globals";
+
+import { MqttHealthIndicator } from "./mqtt.health.js";
 
 describe("MqttHealthIndicator", () => {
   it("responde up cuando el cliente está conectado", async () => {

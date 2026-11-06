@@ -1,8 +1,4 @@
-import mqtt from "mqtt";
-
-import { createMqttServiceClient } from "./mqtt-client.provider";
-
-jest.mock("mqtt");
+import { beforeEach, describe, expect, it, jest } from "@jest/globals";
 
 function crearClienteFalso() {
   const handlers: Record<string, (...args: unknown[]) => void> = {};
@@ -17,6 +13,14 @@ function crearClienteFalso() {
   };
 }
 
+const connectMock = jest.fn();
+
+jest.unstable_mockModule("mqtt", () => ({
+  default: { connect: connectMock },
+}));
+
+const { createMqttServiceClient } = await import("./mqtt-client.provider.js");
+
 describe("createMqttServiceClient", () => {
   const config = {
     url: "mqtt://mosquitto:1883",
@@ -25,16 +29,16 @@ describe("createMqttServiceClient", () => {
   };
 
   beforeEach(() => {
-    jest.clearAllMocks();
+    connectMock.mockReset();
   });
 
   it("se conecta con MQTT 5 y las credenciales del cliente de servicio", () => {
     const clienteFalso = crearClienteFalso();
-    (mqtt.connect as jest.Mock).mockReturnValue(clienteFalso);
+    connectMock.mockReturnValue(clienteFalso);
 
     createMqttServiceClient(config);
 
-    expect(mqtt.connect).toHaveBeenCalledWith(
+    expect(connectMock).toHaveBeenCalledWith(
       config.url,
       expect.objectContaining({
         protocolVersion: 5,
@@ -46,7 +50,7 @@ describe("createMqttServiceClient", () => {
 
   it("registra la conexión exitosa sin imprimir la contraseña", () => {
     const clienteFalso = crearClienteFalso();
-    (mqtt.connect as jest.Mock).mockReturnValue(clienteFalso);
+    connectMock.mockReturnValue(clienteFalso);
     const logger = { log: jest.fn(), error: jest.fn() };
 
     createMqttServiceClient(config, logger);
@@ -59,7 +63,7 @@ describe("createMqttServiceClient", () => {
 
   it("registra un error de conexión sin imprimir la contraseña ni la URL con credenciales", () => {
     const clienteFalso = crearClienteFalso();
-    (mqtt.connect as jest.Mock).mockReturnValue(clienteFalso);
+    connectMock.mockReturnValue(clienteFalso);
     const logger = { log: jest.fn(), error: jest.fn() };
 
     createMqttServiceClient(config, logger);
