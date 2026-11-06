@@ -49,14 +49,50 @@ Ejemplo: `feat(devices): agrega emisión de credenciales de dispositivo`.
 Un commit por tarea completada en verde.
 
 ## 6. Versiones fijadas
-| Herramienta | Versión |
-|---|---|
-| Node | 22.22.3 (`.nvmrc` y `engines`) |
-| pnpm | 10.20.0 (`packageManager`, vía corepack) |
-| MQTT | 5, Eclipse Mosquitto 2.x con Dynamic Security |
+Verificadas en npm registry y Docker Hub el 2026-11-06 (spec 000, tarea T1). Se fijan exactas (sin `^` ni `~`)
+en los `package.json` correspondientes.
 
-Las versiones de NestJS, Prisma, React, Vite, Expo y librerías se **verifican y fijan en el spec 000**;
-no se asumen.
+| Herramienta / paquete | Versión | Uso |
+|---|---|---|
+| Node | 22.22.3 | runtime (`.nvmrc`, `engines`) |
+| pnpm | 10.20.0 | gestor de paquetes (`packageManager`, vía corepack) |
+| TypeScript | 5.9.3 | todo el monorepo (TS 7 aún no es compatible con ts-jest/typescript-eslint) |
+| ESLint | 10.14.0 | lint |
+| typescript-eslint | 8.72.1 | lint TS |
+| Prettier | 3.9.10 | formato |
+| **apps/api** | | |
+| @nestjs/core, /common, /platform-express | 12.4.0 | framework |
+| @nestjs/terminus | 12.1.0 | health checks |
+| @nestjs/config | 12.1.1 | configuración/env |
+| @nestjs/cli | 12.0.12 | tooling Nest |
+| ioredis | 6.0.0 | cliente Redis |
+| mqtt | 5.16.1 | cliente MQTT 5 |
+| class-validator | 0.15.1 | DTOs |
+| class-transformer | 0.5.1 | DTOs |
+| jest | 30.5.2 | tests |
+| ts-jest | 29.4.15 | transform TS en Jest (peer: jest ^29 \|\| ^30) |
+| @types/jest | 30.0.0 | tipos |
+| supertest | 7.3.1 | tests de integración |
+| **apps/web** | | |
+| react, react-dom | 19.3.1 | UI |
+| vite | 8.3.6 | build/dev server |
+| @vitejs/plugin-react | 6.2.1 | plugin React para Vite |
+| vitest | 5.1.0 | unit tests |
+| @playwright/test | 1.65.0 | e2e |
+| **apps/mobile** (Expo SDK 58) | | |
+| expo | 58.0.23 | framework |
+| react, react-dom | 19.3.0 | fijado por Expo SDK 58 (distinto de apps/web) |
+| react-native | 0.88.1 | fijado por Expo SDK 58 |
+| expo-router | 58.0.30 | navegación |
+| expo-dev-client | 58.0.18 | development build |
+| eas-cli | 27.5.0 | tooling EAS (solo local, sin build en la nube) |
+| @testing-library/react-native | 14.1.0 | test de humo |
+| **Infraestructura (Docker)** | | |
+| `postgres` | `16.15` | BD |
+| `redis` | `8.10.3-alpine` | caché/último valor |
+| `eclipse-mosquitto` | `2.0.22` | broker MQTT, Dynamic Security |
+
+Nota: Node mínimo exigido por Expo SDK 58 es 22.13.x, compatible con el Node 22.22.3 fijado arriba.
 
 ## 7. Alcance del MVP
 Entra: tenants, sedes, dispositivos, ingesta HTTP batch y MQTT, lecturas, último valor en Redis,

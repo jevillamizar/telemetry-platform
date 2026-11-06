@@ -1,0 +1,22 @@
+node_modules/
+dist/
+build/
+coverage/
+.env
+.env.*.local
+!.env.example
+*.log
+.DS_Store
+.pnpm-store/
+
+# Expo / React Native
+.expo/
+.expo-shared/
+
+# Playwright
+playwright-report/
+test-results/
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
