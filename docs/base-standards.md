@@ -69,9 +69,13 @@ en los `package.json` correspondientes.
 | mqtt | 5.16.1 | cliente MQTT 5 |
 | class-validator | 0.15.1 | DTOs |
 | class-transformer | 0.5.1 | DTOs |
+| reflect-metadata | 0.2.2 | decoradores (requerido por Nest) |
+| rxjs | 7.8.2 | requerido por Nest |
 | jest | 30.5.2 | tests |
 | ts-jest | 29.4.15 | transform TS en Jest (peer: jest ^29 \|\| ^30) |
 | @types/jest | 30.0.0 | tipos |
+| @types/node | 22.20.5 | tipos (acorde a Node 22) |
+| @types/supertest | 7.2.1 | tipos |
 | supertest | 7.3.1 | tests de integración |
 | **apps/web** | | |
 | react, react-dom | 19.3.1 | UI |
