@@ -101,10 +101,13 @@ verificación indicado, ejecutado antes del cambio.
   en verde, una simulada caída da 503 y el cuerpo no expone errores internos). Cubre CA6 y CA7.
   _Nota: CA6 (200, todo up) se confirma al completar T9 (Mosquitto). CA7 (503, dependencia caída) verificado en e2e._
   _Hallazgo: NestJS 12.4.0 es ESM puro; requirió migración completa de apps/api a NodeNext. Ver ADR 0007._
-- [ ] **T9** — Mosquitto: `infra/mosquitto/mosquitto.conf` (listener 1883, `allow_anonymous false`, plugin Dynamic Security
+- [x] **T9** — Mosquitto: `infra/mosquitto/mosquitto.conf` (listener 1883, `allow_anonymous false`, plugin Dynamic Security
   con `plugin_opt_config_file`), script `infra/mosquitto/init-dynsec.sh` → crea el admin y el cliente de servicio de la API
   con rol de suscripción a `devices/+/telemetry` desde env si el archivo no existe. Verificación: `mosquitto_pub` anónimo
   rechazado y el cliente de servicio aceptado. Cubre CA4 y CA5.
+  _Verificado manualmente contra el contenedor real (sin integrar aún a docker-compose.yml, eso es T10):
+  anónimo y credenciales inválidas rechazados, cliente de servicio autenticado y con SUBACK válido en
+  `devices/+/telemetry`, bootstrap idempotente tras restart. Detalle de permisos documentado en ADR 0004._
 - [ ] **T10** — `docker-compose.yml`: red `coldchain`, volúmenes nombrados, `postgres:16.x` (healthcheck `pg_isready`),
   `redis` (healthcheck `redis-cli ping`), `mosquitto` (healthcheck con el cliente de servicio), `api` (`build` desde
   `apps/api/Dockerfile` multi-stage, `depends_on: condition: service_healthy`, healthcheck a `/api/health`).
@@ -129,6 +132,8 @@ verificación indicado, ejecutado antes del cambio.
 - Puertos 5432, 6379, 1883 o 3000 ocupados en el host → puertos publicados configurables por env.
 - Variables obligatorias ausentes → la API no arranca y nombra la variable que falta (sin imprimir valores).
 - Archivo de Dynamic Security inexistente en el primer arranque → el init lo crea; si ya existe, no lo sobrescribe (idempotente).
+- Mosquitto baja privilegios al usuario `mosquitto` tras abrir el socket → el init hace `chown mosquitto:mosquitto`
+  sobre `dynamic-security.json` recién creado (si no, el broker no puede releerlo). Ver ADR 0004.
 - Mosquitto arranca después de la API → reconexión con backoff; el health reporta `mqtt: down` hasta conectar.
 - Health check con una dependencia colgada → timeout por check (p. ej. 1 s) para que el endpoint no se bloquee.
 - Lockfile generado en Windows y CI en Linux → `--frozen-lockfile` debe pasar; se verifica en T14.
