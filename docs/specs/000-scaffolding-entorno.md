@@ -44,27 +44,27 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
 - Despliegue a cualquier ambiente que no sea local.
 
 ## Criterios de aceptación
-- [ ] **CA1** — Dado el repo clonado con Node 22.22.3, cuando ejecuto `corepack enable` y `pnpm install`, entonces
+- [x] **CA1** — Dado el repo clonado con Node 22.22.3, cuando ejecuto `corepack enable` y `pnpm install`, entonces
   instala sin errores, `pnpm --version` es `10.20.0` y se genera `pnpm-lock.yaml`.
-- [ ] **CA2** — Dado Node distinto de 22.22.3, cuando ejecuto `pnpm install`, entonces falla con un mensaje de `engines`.
-- [ ] **CA3** — Dado `.env` copiado de `.env.example`, cuando ejecuto `docker compose up -d --wait`, entonces
+- [x] **CA2** — Dado Node distinto de 22.22.3, cuando ejecuto `pnpm install`, entonces falla con un mensaje de `engines`.
+- [x] **CA3** — Dado `.env` copiado de `.env.example`, cuando ejecuto `docker compose up -d --wait`, entonces
   `postgres`, `redis`, `mosquitto` y `api` quedan `healthy`.
-- [ ] **CA4** — Dado el stack arriba, cuando un cliente MQTT se conecta sin credenciales o con credenciales inválidas,
+- [x] **CA4** — Dado el stack arriba, cuando un cliente MQTT se conecta sin credenciales o con credenciales inválidas,
   entonces el broker rechaza la conexión.
-- [ ] **CA5** — Dado el stack arriba, cuando la API arranca, entonces se conecta a Mosquitto con su cliente de servicio
+- [x] **CA5** — Dado el stack arriba, cuando la API arranca, entonces se conecta a Mosquitto con su cliente de servicio
   (credenciales desde variables de entorno) y lo registra en el log sin imprimir secretos.
-- [ ] **CA6** — Dado el stack arriba, cuando llamo `GET /api/health`, entonces responde `200` con
+- [x] **CA6** — Dado el stack arriba, cuando llamo `GET /api/health`, entonces responde `200` con
   `{ "status": "ok", "checks": { "postgres": "up", "redis": "up", "mqtt": "up" } }`.
-- [ ] **CA7** — Dado que una dependencia (p. ej. Redis) está caída, cuando llamo `GET /api/health`, entonces responde
+- [x] **CA7** — Dado que una dependencia (p. ej. Redis) está caída, cuando llamo `GET /api/health`, entonces responde
   `503` con `status: "error"` y esa dependencia en `"down"`, sin filtrar mensajes internos ni credenciales.
 - [ ] **CA8** — Dado el monorepo, cuando ejecuto `pnpm -r lint`, `pnpm -r typecheck`, `pnpm -r test` y `pnpm -r build`,
   entonces todos terminan en verde.
 - [ ] **CA9** — Dado un push o PR a `main`, cuando corre `.github/workflows/ci.yml`, entonces todos los pasos terminan en verde.
 - [ ] **CA10** — Dado `apps/mobile`, cuando ejecuto `pnpm --filter mobile exec expo config --type public` y
   `npx expo-doctor`, entonces la configuración es válida e incluye `expo-dev-client` y `expo-router`.
-- [ ] **CA11** — Dado el repo, cuando busco secretos, entonces ningún `.env` real está versionado y `.env.example`
+- [x] **CA11** — Dado el repo, cuando busco secretos, entonces ningún `.env` real está versionado y `.env.example`
   no contiene valores reales.
-- [ ] **CA12** — Dado `docs/base-standards.md` §6, cuando reviso las versiones, entonces todas las dependencias
+- [x] **CA12** — Dado `docs/base-standards.md` §6, cuando reviso las versiones, entonces todas las dependencias
   principales figuran con versión exacta verificada y coinciden con los `package.json` (sin `^` ni `~`).
 
 > **Aislamiento entre tenants:** no aplica en este spec, porque no hay datos operativos. Se justifica según
@@ -99,7 +99,7 @@ verificación indicado, ejecutado antes del cambio.
 - [x] **T8** — `apps/api/src/health/health.controller.ts` → `HealthController.check()` en `GET /api/health`, sin guard,
   con la respuesta de CA6 y CA7. Test de integración rojo `test/health.e2e-spec.ts` con Supertest (dependencias reales
   en verde, una simulada caída da 503 y el cuerpo no expone errores internos). Cubre CA6 y CA7.
-  _Nota: CA6 (200, todo up) se confirma al completar T9 (Mosquitto). CA7 (503, dependencia caída) verificado en e2e._
+  _CA6 (200, todo up) confirmado end-to-end en T10 contra el stack completo. CA7 verificado en e2e desde esta tarea._
   _Hallazgo: NestJS 12.4.0 es ESM puro; requirió migración completa de apps/api a NodeNext. Ver ADR 0007._
 - [x] **T9** — Mosquitto: `infra/mosquitto/mosquitto.conf` (listener 1883, `allow_anonymous false`, plugin Dynamic Security
   con `plugin_opt_config_file`), script `infra/mosquitto/init-dynsec.sh` → crea el admin y el cliente de servicio de la API
@@ -108,11 +108,15 @@ verificación indicado, ejecutado antes del cambio.
   _Verificado manualmente contra el contenedor real (sin integrar aún a docker-compose.yml, eso es T10):
   anónimo y credenciales inválidas rechazados, cliente de servicio autenticado y con SUBACK válido en
   `devices/+/telemetry`, bootstrap idempotente tras restart. Detalle de permisos documentado en ADR 0004._
-- [ ] **T10** — `docker-compose.yml`: red `coldchain`, volúmenes nombrados, `postgres:16.x` (healthcheck `pg_isready`),
+- [x] **T10** — `docker-compose.yml`: red `coldchain`, volúmenes nombrados, `postgres:16.x` (healthcheck `pg_isready`),
   `redis` (healthcheck `redis-cli ping`), `mosquitto` (healthcheck con el cliente de servicio), `api` (`build` desde
   `apps/api/Dockerfile` multi-stage, `depends_on: condition: service_healthy`, healthcheck a `/api/health`).
   Puertos al host configurables por env. `.env.example` con todas las variables y sin valores reales.
   Verificación: `docker compose up -d --wait`. Cubre CA3 y CA11.
+  _Confirmado contra el stack real: los 4 servicios quedan `healthy`; `GET /api/health` responde 200 con los
+  tres checks en `up` (CA6, pendiente desde T8) y 503 al detener Redis (CA7). Bug encontrado y corregido:
+  `tsc` compilaba a `dist/src/main.js` en vez de `dist/main.js` e incluía los `*.spec.ts`; se agregó
+  `apps/api/tsconfig.build.json` (rootDir `src`, excluye specs) y se ajustó el script `build`._
 - [ ] **T11** — `apps/web` mínimo: Vite + React + TS, `src/App.tsx` → `App` con el título del producto, test Vitest rojo
   `src/App.test.tsx`, `playwright.config.ts` y `e2e/smoke.spec.ts` (la página carga). Cubre CA8.
 - [ ] **T12** — `apps/mobile` mínimo: Expo SDK verificado en T1, Expo Router (`app/_layout.tsx`, `app/index.tsx`),

@@ -2,16 +2,18 @@ services:
   postgres:
     image: postgres:16.15
     environment:
-      POSTGRES_USER: coldchain
-      POSTGRES_PASSWORD: coldchain
-      POSTGRES_DB: coldchain
+      POSTGRES_USER: ${POSTGRES_USER:-coldchain}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coldchain}
+      POSTGRES_DB: ${POSTGRES_DB:-coldchain}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U coldchain"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-coldchain}"]
       interval: 5s
       timeout: 3s
       retries: 10
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - coldchain
 
@@ -27,6 +29,65 @@ services:
     networks:
       - coldchain
 
+  mosquitto:
+    image: eclipse-mosquitto:2.0.22
+    environment:
+      MOSQUITTO_ADMIN_USERNAME: ${MOSQUITTO_ADMIN_USERNAME:-admin}
+      MOSQUITTO_ADMIN_PASSWORD: ${MOSQUITTO_ADMIN_PASSWORD:-admin}
+      MQTT_SERVICE_USERNAME: ${MQTT_SERVICE_USERNAME:-api-service}
+      MQTT_SERVICE_PASSWORD: ${MQTT_SERVICE_PASSWORD:-api-service}
+    command: ["sh", "/mosquitto/config/init-dynsec.sh"]
+    volumes:
+      - ./infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./infra/mosquitto/init-dynsec.sh:/mosquitto/config/init-dynsec.sh
+      - mosquitto-data:/mosquitto/data
+    ports:
+      - "${MOSQUITTO_PORT:-1883}:1883"
+    healthcheck:
+      # El cliente de servicio se suscribe a su único tópico permitido; sin un dispositivo
+      # publicando, no llega mensaje y agota el tiempo (exit 27), lo que confirma autenticación
+      # y autorización correctas. Cualquier otro código (p. ej. 5 = no autorizado) es "unhealthy".
+      test: ["CMD-SHELL", "mosquitto_sub -h 127.0.0.1 -p 1883 -u \"$$MQTT_SERVICE_USERNAME\" -P \"$$MQTT_SERVICE_PASSWORD\" -t 'devices/+/telemetry' -C 1 -W 2 >/dev/null 2>&1; code=$$?; test \"$$code\" = \"0\" -o \"$$code\" = \"27\""]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+    networks:
+      - coldchain
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      PORT: "3000"
+      DATABASE_URL: postgresql://${POSTGRES_USER:-coldchain}:${POSTGRES_PASSWORD:-coldchain}@postgres:5432/${POSTGRES_DB:-coldchain}
+      REDIS_URL: redis://redis:6379
+      MQTT_URL: mqtt://mosquitto:1883
+      MQTT_SERVICE_USERNAME: ${MQTT_SERVICE_USERNAME:-api-service}
+      MQTT_SERVICE_PASSWORD: ${MQTT_SERVICE_PASSWORD:-api-service}
+    ports:
+      - "${API_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      mosquitto:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks:
+      - coldchain
+
 networks:
   coldchain:
     driver: bridge
+
+volumes:
+  postgres-data:
+  mosquitto-data:
