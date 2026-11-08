@@ -60,8 +60,8 @@ en los `package.json` correspondientes.
 | ESLint | 10.14.0 | lint |
 | typescript-eslint | 8.72.1 | lint TS |
 | Prettier | 3.9.10 | formato |
-| **apps/api** | | |
-| @nestjs/core, /common, /platform-express | 12.4.0 | framework |
+| **apps/api** _(ESM puro — ver ADR 0007)_ | | |
+| @nestjs/core, /common, /platform-express | 12.4.0 | framework — ESM puro desde v12 |
 | @nestjs/terminus | 12.1.0 | health checks |
 | @nestjs/config | 12.1.1 | configuración/env |
 | @nestjs/cli | 12.0.12 | tooling Nest |
@@ -75,9 +75,9 @@ en los `package.json` correspondientes.
 | class-transformer | 0.5.1 | DTOs |
 | reflect-metadata | 0.2.2 | decoradores (requerido por Nest) |
 | rxjs | 7.8.2 | requerido por Nest |
-| jest | 30.5.2 | tests |
-| @jest/globals | 30.5.2 | `describe`/`it`/`jest` explícitos (no se inyectan globals en ESM) |
-| ts-jest | 29.4.15 | transform TS en Jest (peer: jest ^29 \|\| ^30) |
+| jest | 30.5.2 | tests — invocar con `node --experimental-vm-modules node_modules/jest/bin/jest.js` |
+| @jest/globals | 30.5.2 | `describe`/`it`/`jest` explícitos (obligatorio en ESM; no hay auto-inject) |
+| ts-jest | 29.4.15 | transform TS en Jest con `useESM: true` (peer: jest ^29 \|\| ^30) |
 | @types/jest | 30.0.0 | tipos |
 | @types/node | 22.20.5 | tipos (acorde a Node 22) |
 | @types/supertest | 7.2.1 | tipos |

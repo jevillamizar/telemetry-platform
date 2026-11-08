@@ -2,7 +2,7 @@
 
 - **Estado:** Aprobado
 - **Depende de:** —
-- **ADR relacionados:** 0001 (monolito modular), 0002 (sin Kafka), 0004 (Mosquitto Dynamic Security)
+- **ADR relacionados:** 0001 (monolito modular), 0002 (sin Kafka), 0004 (Mosquitto Dynamic Security), 0007 (NestJS 12 ESM puro)
 
 ## Historia de usuario
 Como desarrollador del equipo, quiero un monorepo reproducible con la infraestructura local y el CI listos,
@@ -74,31 +74,33 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
 Cada tarea es un ciclo de `/implementar`. En las tareas solo de configuración, el "test rojo" es el comando de
 verificación indicado, ejecutado antes del cambio.
 
-- [ ] **T0** — Prerrequisito manual (usuario): Node 22.22.3 con fnm y pnpm 10.20.0 con corepack. Verificación:
+- [x] **T0** — Prerrequisito manual (usuario): Node 22.22.3 con fnm y pnpm 10.20.0 con corepack. Verificación:
   `node --version` y `pnpm --version`. Opcional: renombrar `master` → `main`.
-- [ ] **T1** — Verificar versiones vigentes (npm registry y Docker Hub) de NestJS, @nestjs/terminus, ioredis, mqtt,
+- [x] **T1** — Verificar versiones vigentes (npm registry y Docker Hub) de NestJS, @nestjs/terminus, ioredis, mqtt,
   React, Vite, Vitest, Playwright, Expo SDK (y sus RN/React compatibles), TypeScript, ESLint, Prettier, Jest, Supertest,
   y los tags de las imágenes `postgres:16.x`, `redis`, `eclipse-mosquitto:2.x`. Registrar la tabla en
   `docs/base-standards.md` §6. Cubre CA12.
-- [ ] **T2** — Raíz: `.nvmrc`, `.npmrc`, `package.json` (scripts `lint`, `typecheck`, `test`, `build` recursivos),
+- [x] **T2** — Raíz: `.nvmrc`, `.npmrc`, `package.json` (scripts `lint`, `typecheck`, `test`, `build` recursivos),
   `pnpm-workspace.yaml`, `tsconfig.base.json` (`strict`, `noUncheckedIndexedAccess`), `.editorconfig`, `.gitignore`.
   Verificación: `pnpm install` en verde y en rojo con otra versión de Node. Cubre CA1, CA2 y CA11.
-- [ ] **T3** — Lint y formato compartidos: `eslint.config.mjs` (flat config, typescript-eslint) y `prettier.config.mjs` en la raíz.
+- [x] **T3** — Lint y formato compartidos: `eslint.config.mjs` (flat config, typescript-eslint) y `prettier.config.mjs` en la raíz.
   Verificación: `pnpm -r lint`. Cubre CA8.
-- [ ] **T4** — `apps/api` mínimo: `src/main.ts` → `bootstrap()` (prefijo global `api`, puerto desde `PORT`),
+- [x] **T4** — `apps/api` mínimo: `src/main.ts` → `bootstrap()` (prefijo global `api`, puerto desde `PORT`),
   `src/app.module.ts` → `AppModule`, `src/config/env.validation.ts` → `validateEnv()` (falla rápido si faltan variables).
   Test rojo: `test/env.validation.spec.ts` (rechaza la configuración sin `DATABASE_URL`, `REDIS_URL` y `MQTT_URL`).
   Cubre CA8.
-- [ ] **T5** — `apps/api/src/health/indicators/postgres.health.ts` → `PostgresHealthIndicator.check()` (`SELECT 1` con
+- [x] **T5** — `apps/api/src/health/indicators/postgres.health.ts` → `PostgresHealthIndicator.check()` (`SELECT 1` con
   timeout). Test unitario rojo con un cliente simulado: `up` y `down`. Cubre CA6 y CA7.
-- [ ] **T6** — `apps/api/src/health/indicators/redis.health.ts` → `RedisHealthIndicator.check()` (`PING` con timeout).
+- [x] **T6** — `apps/api/src/health/indicators/redis.health.ts` → `RedisHealthIndicator.check()` (`PING` con timeout).
   Test unitario `up` y `down`. Cubre CA6 y CA7.
-- [ ] **T7** — `apps/api/src/mqtt/mqtt-client.provider.ts` → `createMqttServiceClient()` (MQTT 5, credenciales del cliente
+- [x] **T7** — `apps/api/src/mqtt/mqtt-client.provider.ts` → `createMqttServiceClient()` (MQTT 5, credenciales del cliente
   de servicio desde env, reconexión, log sin secretos) y `apps/api/src/health/indicators/mqtt.health.ts` →
   `MqttHealthIndicator.check()`. Tests unitarios. Cubre CA5, CA6 y CA7.
-- [ ] **T8** — `apps/api/src/health/health.controller.ts` → `HealthController.check()` en `GET /api/health`, sin guard,
+- [x] **T8** — `apps/api/src/health/health.controller.ts` → `HealthController.check()` en `GET /api/health`, sin guard,
   con la respuesta de CA6 y CA7. Test de integración rojo `test/health.e2e-spec.ts` con Supertest (dependencias reales
   en verde, una simulada caída da 503 y el cuerpo no expone errores internos). Cubre CA6 y CA7.
+  _Nota: CA6 (200, todo up) se confirma al completar T9 (Mosquitto). CA7 (503, dependencia caída) verificado en e2e._
+  _Hallazgo: NestJS 12.4.0 es ESM puro; requirió migración completa de apps/api a NodeNext. Ver ADR 0007._
 - [ ] **T9** — Mosquitto: `infra/mosquitto/mosquitto.conf` (listener 1883, `allow_anonymous false`, plugin Dynamic Security
   con `plugin_opt_config_file`), script `infra/mosquitto/init-dynsec.sh` → crea el admin y el cliente de servicio de la API
   con rol de suscripción a `devices/+/telemetry` desde env si el archivo no existe. Verificación: `mosquitto_pub` anónimo
