@@ -104,13 +104,17 @@ en los `package.json` correspondientes.
 | @types/jest | 30.0.0 | tipos del test runner (jest-expo) |
 | jest-expo | 58.0.14 | preset de Jest para Expo SDK 58 |
 | babel-preset-expo | 58.0.24 | preset de Babel requerido por `babel.config.js` |
-
-`eas-cli` (27.5.0) se invoca vía `pnpm dlx`/`npx`, **no** como dependencia del proyecto: `expo-doctor`
-rechaza tenerlo instalado localmente ("EAS CLI should not be installed in your project").
+| **apps/simulator** | | |
+| typescript | 5.9.3 | sin conflicto de versión (no usa Expo) |
+| vitest | 5.1.0 | unit tests, entorno `node` |
+| @types/node | 22.20.5 | tipos |
 | **Infraestructura (Docker)** | | |
 | `postgres` | `16.15` | BD |
 | `redis` | `8.10.3-alpine` | caché/último valor |
 | `eclipse-mosquitto` | `2.0.22` | broker MQTT, Dynamic Security |
+
+`eas-cli` (27.5.0) se invoca vía `pnpm dlx`/`npx`, **no** como dependencia del proyecto: `expo-doctor`
+rechaza tenerlo instalado localmente ("EAS CLI should not be installed in your project").
 
 Nota: Node mínimo exigido por Expo SDK 58 es 22.13.x, compatible con el Node 22.22.3 fijado arriba.
 

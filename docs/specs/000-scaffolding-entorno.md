@@ -138,8 +138,13 @@ verificación indicado, ejecutado antes del cambio.
   usa `await render(...)` en vez del patrón síncrono anterior._
   _Verificado: `expo config --type public` y `expo-doctor` (20/20) en verde, `pnpm -r lint/typecheck/test/build`
   en verde con los 3 apps (mobile queda fuera de `build`: no tiene ese script, sin build en la nube)._
-- [ ] **T13** — `apps/simulator` mínimo: `src/index.ts` → `main()` que valida su configuración y termina; test de humo.
+- [x] **T13** — `apps/simulator` mínimo: `src/index.ts` → `main()` que valida su configuración y termina; test de humo.
   Cubre CA8.
+  _Entry point en `src/main.ts` (no `index.ts`), por consistencia con la convención ya usada en
+  `apps/api`. `main()` llama a `loadConfig()` (en `src/config.ts`, testeable por separado) y valida
+  `MQTT_URL`; sin esa variable termina con `exitCode 1` y un mensaje que no imprime valores, solo el
+  nombre de la variable faltante. Sin hallazgos de entorno esta vez: instalación, lint, typecheck,
+  test (Vitest) y build en verde en el primer intento._
 - [ ] **T14** — `.github/workflows/ci.yml`: `ubuntu-latest`, `actions/setup-node` con `node-version-file: .nvmrc`,
   `corepack enable`, caché de pnpm, `pnpm install --frozen-lockfile`, lint, typecheck, test (con `services:` Postgres 16
   y Redis, y Mosquitto como contenedor con la config de `infra/`) y build. Playwright con navegador Chromium.
