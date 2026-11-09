@@ -124,10 +124,20 @@ verificación indicado, ejecutado antes del cambio.
   al cargar en el worker de Vitest (bug de esa versión de undici, no de este proyecto). `happy-dom` no
   depende de `undici` y es más liviano para un smoke test. Verificado: `pnpm -r lint/typecheck/test/build`
   en verde (apps/api + apps/web) y `pnpm test:e2e` (Playwright/Chromium) en verde._
-- [ ] **T12** — `apps/mobile` mínimo: Expo SDK verificado en T1, Expo Router (`app/_layout.tsx`, `app/index.tsx`),
+- [x] **T12** — `apps/mobile` mínimo: Expo SDK verificado en T1, Expo Router (`app/_layout.tsx`, `app/index.tsx`),
   `expo-dev-client`, `app.json` (Android primero, `scheme`, `android.package`), `eas.json` con perfil `development`
   (`developmentClient: true`, `distribution: internal`), test de humo con React Native Testing Library. Sin build en la nube.
   Cubre CA8 y CA10.
+  _Hallazgos de `expo-doctor` (20/20 al cerrar): `newArchEnabled` ya no es campo válido del esquema de
+  app.json en SDK 58 (se quitó); `eas-cli` no debe instalarse como dependencia del proyecto (se invoca con
+  `npx`/`pnpm dlx`, ver base-standards.md); faltaban los peers reales de `expo-router`
+  (`expo-constants`, `expo-linking`, `react-native-safe-area-context`, instalados con `expo install`);
+  Expo SDK 58 exige TypeScript `~6.0.3`, incompatible con el 5.9.3 fijado para el resto del monorepo —
+  se fija como excepción documentada solo en `apps/mobile/package.json` (compatible con
+  `typescript-eslint`). `@testing-library/react-native@14` cambió `render()` a `async`; el test de humo
+  usa `await render(...)` en vez del patrón síncrono anterior._
+  _Verificado: `expo config --type public` y `expo-doctor` (20/20) en verde, `pnpm -r lint/typecheck/test/build`
+  en verde con los 3 apps (mobile queda fuera de `build`: no tiene ese script, sin build en la nube)._
 - [ ] **T13** — `apps/simulator` mínimo: `src/index.ts` → `main()` que valida su configuración y termina; test de humo.
   Cubre CA8.
 - [ ] **T14** — `.github/workflows/ci.yml`: `ubuntu-latest`, `actions/setup-node` con `node-version-file: .nvmrc`,

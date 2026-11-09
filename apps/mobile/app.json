@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "ColdChain Telemetry",
+    "slug": "coldchain-telemetry-mobile",
+    "scheme": "coldchain",
+    "version": "0.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "platforms": ["android"],
+    "android": {
+      "package": "com.coldchain.telemetry"
+    },
+    "plugins": ["expo-router", "expo-dev-client"]
+  }
+}

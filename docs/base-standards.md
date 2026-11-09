@@ -95,10 +95,18 @@ en los `package.json` correspondientes.
 | expo | 58.0.23 | framework |
 | react, react-dom | 19.3.0 | fijado por Expo SDK 58 (distinto de apps/web) |
 | react-native | 0.88.1 | fijado por Expo SDK 58 |
+| typescript | **6.0.3** | excepción al 5.9.3 del resto del monorepo: lo exige Expo SDK 58 (`expo-doctor`); compatible con `typescript-eslint@8.72.1` (rango `>=4.8.4 <6.1.0`). Ver T12 |
 | expo-router | 58.0.30 | navegación |
 | expo-dev-client | 58.0.18 | development build |
-| eas-cli | 27.5.0 | tooling EAS (solo local, sin build en la nube) |
-| @testing-library/react-native | 14.1.0 | test de humo |
+| expo-constants, expo-linking | 58.0.15 / 58.0.16 | peers reales de `expo-router` (instalados con `expo install`, no en T1) |
+| react-native-safe-area-context | 5.11.1 | peer real de `expo-router` (ídem) |
+| @testing-library/react-native | 14.1.0 | test de humo; `render()` es `async` en esta major |
+| @types/jest | 30.0.0 | tipos del test runner (jest-expo) |
+| jest-expo | 58.0.14 | preset de Jest para Expo SDK 58 |
+| babel-preset-expo | 58.0.24 | preset de Babel requerido por `babel.config.js` |
+
+`eas-cli` (27.5.0) se invoca vía `pnpm dlx`/`npx`, **no** como dependencia del proyecto: `expo-doctor`
+rechaza tenerlo instalado localmente ("EAS CLI should not be installed in your project").
 | **Infraestructura (Docker)** | | |
 | `postgres` | `16.15` | BD |
 | `redis` | `8.10.3-alpine` | caché/último valor |
