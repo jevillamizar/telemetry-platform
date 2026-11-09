@@ -57,7 +57,7 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
   `{ "status": "ok", "checks": { "postgres": "up", "redis": "up", "mqtt": "up" } }`.
 - [x] **CA7** — Dado que una dependencia (p. ej. Redis) está caída, cuando llamo `GET /api/health`, entonces responde
   `503` con `status: "error"` y esa dependencia en `"down"`, sin filtrar mensajes internos ni credenciales.
-- [ ] **CA8** — Dado el monorepo, cuando ejecuto `pnpm -r lint`, `pnpm -r typecheck`, `pnpm -r test` y `pnpm -r build`,
+- [x] **CA8** — Dado el monorepo, cuando ejecuto `pnpm -r lint`, `pnpm -r typecheck`, `pnpm -r test` y `pnpm -r build`,
   entonces todos terminan en verde.
 - [ ] **CA9** — Dado un push o PR a `main`, cuando corre `.github/workflows/ci.yml`, entonces todos los pasos terminan en verde.
 - [ ] **CA10** — Dado `apps/mobile`, cuando ejecuto `pnpm --filter mobile exec expo config --type public` y
