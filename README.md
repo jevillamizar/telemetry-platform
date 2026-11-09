@@ -1,7 +1,9 @@
-# ColdChain Telemetry Platform
+# TEIOT
 
-SaaS B2B multi-tenant para monitoreo de cadena de frío (temperatura de equipos de refrigeración),
-con ingesta de telemetría por HTTP batch y MQTT, alertas por umbral y dashboards web/móvil.
+SaaS B2B multi-tenant de telemetría para sistemas IoT: ingesta de datos de dispositivos por HTTP
+batch y MQTT, alertas por umbral y dashboards web/móvil. El monitoreo de cadena de frío (temperatura
+de equipos de refrigeración) es la vertical insignia y la primera implementada, pero el modelo de
+dispositivo/lectura/alerta es genérico.
 
 
 ## Stack previsto
@@ -13,3 +15,4 @@ Las versiones exactas verificadas están en [`docs/base-standards.md` §6](docs/
 
 ## Comandos
 
+Ver la tabla de comandos verificados en [`CLAUDE.md`](CLAUDE.md#comandos-del-proyecto).

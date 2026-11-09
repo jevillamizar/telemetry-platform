@@ -21,7 +21,7 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
 | PostgreSQL | Imagen `postgres:16` (tag menor exacto fijado en T2) |
 | Móvil | Development Build desde el inicio: `expo-dev-client` y `eas.json` incluidos en este spec |
 | Health | `GET /api/health` compuesto: Postgres, Redis y MQTT |
-| Red Docker | Red privada `coldchain` por nombre de servicio; solo se publican al host los puertos necesarios |
+| Red Docker | Red privada `teiot` por nombre de servicio; solo se publican al host los puertos necesarios |
 | CI | Runners públicos de GitHub (`ubuntu-latest`) con `services:` para Postgres y Redis |
 
 ## Alcance
@@ -109,7 +109,7 @@ verificación indicado, ejecutado antes del cambio.
   _Verificado manualmente contra el contenedor real (sin integrar aún a docker-compose.yml, eso es T10):
   anónimo y credenciales inválidas rechazados, cliente de servicio autenticado y con SUBACK válido en
   `devices/+/telemetry`, bootstrap idempotente tras restart. Detalle de permisos documentado en ADR 0004._
-- [x] **T10** — `docker-compose.yml`: red `coldchain`, volúmenes nombrados, `postgres:16.x` (healthcheck `pg_isready`),
+- [x] **T10** — `docker-compose.yml`: red `teiot`, volúmenes nombrados, `postgres:16.x` (healthcheck `pg_isready`),
   `redis` (healthcheck `redis-cli ping`), `mosquitto` (healthcheck con el cliente de servicio), `api` (`build` desde
   `apps/api/Dockerfile` multi-stage, `depends_on: condition: service_healthy`, healthcheck a `/api/health`).
   Puertos al host configurables por env. `.env.example` con todas las variables y sin valores reales.

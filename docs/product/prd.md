@@ -1,6 +1,11 @@
-# PRD — ColdChain Telemetry Platform (nombre de trabajo)
+# PRD — TEIOT
 
 > Redactado a partir de la definición inicial del proyecto. Pendiente: propuesta comercial (precios, planes y modelo de venta), que no existe todavía.
+
+**TEIOT** es una plataforma de telemetría multi-tenant para sistemas IoT en general (dispositivo → lectura →
+alerta por umbral, aislado por tenant). Este PRD describe su primera vertical y demo técnica: monitoreo de
+cadena de frío. El modelo de dominio (tenant, sede, dispositivo, lectura, alerta) no asume refrigeración;
+cualquier dispositivo que reporte una métrica numérica con umbrales encaja sin cambios de esquema.
 
 ## Problema
 Las empresas con varias sedes y equipos de frío detectan tarde las excursiones de temperatura,

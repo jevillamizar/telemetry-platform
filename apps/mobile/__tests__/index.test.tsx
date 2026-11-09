@@ -6,6 +6,6 @@ describe("Index", () => {
   it("muestra el título del producto", async () => {
     const { getByText } = await render(<Index />);
 
-    expect(getByText("ColdChain Telemetry Platform")).toBeTruthy();
+    expect(getByText("TEIOT")).toBeTruthy();
   });
 });

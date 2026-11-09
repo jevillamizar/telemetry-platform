@@ -2,20 +2,20 @@ services:
   postgres:
     image: postgres:16.15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-coldchain}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-coldchain}
-      POSTGRES_DB: ${POSTGRES_DB:-coldchain}
+      POSTGRES_USER: ${POSTGRES_USER:-teiot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-teiot}
+      POSTGRES_DB: ${POSTGRES_DB:-teiot}
     ports:
       - "${POSTGRES_PORT:-5432}:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-coldchain}"]
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-teiot}"]
       interval: 5s
       timeout: 3s
       retries: 10
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - coldchain
+      - teiot
 
   redis:
     image: redis:8.10.3-alpine
@@ -27,7 +27,7 @@ services:
       timeout: 3s
       retries: 10
     networks:
-      - coldchain
+      - teiot
 
   mosquitto:
     image: eclipse-mosquitto:2.0.22
@@ -53,7 +53,7 @@ services:
       retries: 10
       start_period: 5s
     networks:
-      - coldchain
+      - teiot
 
   api:
     build:
@@ -61,7 +61,7 @@ services:
       dockerfile: apps/api/Dockerfile
     environment:
       PORT: "3000"
-      DATABASE_URL: postgresql://${POSTGRES_USER:-coldchain}:${POSTGRES_PASSWORD:-coldchain}@postgres:5432/${POSTGRES_DB:-coldchain}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-teiot}:${POSTGRES_PASSWORD:-teiot}@postgres:5432/${POSTGRES_DB:-teiot}
       REDIS_URL: redis://redis:6379
       MQTT_URL: mqtt://mosquitto:1883
       MQTT_SERVICE_USERNAME: ${MQTT_SERVICE_USERNAME:-api-service}
@@ -82,10 +82,10 @@ services:
       retries: 10
       start_period: 10s
     networks:
-      - coldchain
+      - teiot
 
 networks:
-  coldchain:
+  teiot:
     driver: bridge
 
 volumes:

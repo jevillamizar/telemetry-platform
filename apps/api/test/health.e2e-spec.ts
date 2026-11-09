@@ -85,7 +85,7 @@ describe("GET /api/health (e2e, dependencias reales)", () => {
         expect(respuesta.body.checks.mqtt).toBe("up");
 
         const cuerpoComoTexto = JSON.stringify(respuesta.body);
-        expect(cuerpoComoTexto).not.toMatch(/ECONNREFUSED|localhost|password|coldchain:coldchain/i);
+        expect(cuerpoComoTexto).not.toMatch(/ECONNREFUSED|localhost|password|teiot:teiot/i);
       },
       20_000,
     );

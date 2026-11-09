@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DATABASE_URL: postgresql://coldchain:coldchain@localhost:5432/coldchain
+      DATABASE_URL: postgresql://teiot:teiot@localhost:5432/teiot
       REDIS_URL: redis://localhost:6379
       MQTT_URL: mqtt://localhost:1883
       MQTT_SERVICE_USERNAME: api-service
@@ -21,13 +21,13 @@ jobs:
       postgres:
         image: postgres:16.15
         env:
-          POSTGRES_USER: coldchain
-          POSTGRES_PASSWORD: coldchain
-          POSTGRES_DB: coldchain
+          POSTGRES_USER: teiot
+          POSTGRES_PASSWORD: teiot
+          POSTGRES_DB: teiot
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U coldchain"
+          --health-cmd "pg_isready -U teiot"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10

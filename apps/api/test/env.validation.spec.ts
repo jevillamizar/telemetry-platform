@@ -4,7 +4,7 @@ import { validateEnv } from "../src/config/env.validation.js";
 
 describe("validateEnv", () => {
   const configCompleta = {
-    DATABASE_URL: "postgresql://user:pass@localhost:5432/coldchain",
+    DATABASE_URL: "postgresql://user:pass@localhost:5432/teiot",
     REDIS_URL: "redis://localhost:6379",
     MQTT_URL: "mqtt://localhost:1883",
   };

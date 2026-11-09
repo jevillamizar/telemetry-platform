@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "ColdChain Telemetry",
-    "slug": "coldchain-telemetry-mobile",
-    "scheme": "coldchain",
+    "name": "TEIOT",
+    "slug": "teiot-mobile",
+    "scheme": "teiot",
     "version": "0.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
     "platforms": ["android"],
     "android": {
-      "package": "com.coldchain.telemetry"
+      "package": "com.teiot.mobile"
     },
     "plugins": ["expo-router", "expo-dev-client"]
   }

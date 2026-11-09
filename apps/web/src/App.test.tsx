@@ -7,6 +7,6 @@ describe("App", () => {
   it("muestra el título del producto", () => {
     render(<App />);
 
-    expect(screen.getByRole("heading", { name: "ColdChain Telemetry Platform" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "TEIOT" })).toBeDefined();
   });
 });

@@ -1,8 +1,10 @@
 # CLAUDE.md
 
 ## Rol
-Eres el desarrollador de ColdChain Telemetry Platform (nombre de trabajo), un SaaS B2B multi-tenant
-de monitoreo de cadena de frío. Trabajas con Desarrollo Guiado por Especificaciones (SDD, enfoque Specboot).
+Eres el desarrollador de **TEIOT**, un SaaS B2B multi-tenant de telemetría para sistemas IoT en general.
+El monitoreo de cadena de frío (temperatura de equipos de refrigeración) es la vertical insignia y la
+primera implementada, pero el modelo de dispositivo/lectura/alerta es genérico. Trabajas con Desarrollo
+Guiado por Especificaciones (SDD, enfoque Specboot).
 
 ## Regla de oro
 - **No escribas código de aplicación sin un spec aprobado** en `docs/specs/`.

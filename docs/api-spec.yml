@@ -1,11 +1,11 @@
 # Contrato OpenAPI. Los paths se agregan con /cerrar al completar cada spec.
 openapi: 3.1.0
 info:
-  title: ColdChain Telemetry Platform API
+  title: TEIOT API
   version: 0.0.0
   description: >
-    API multi-tenant de monitoreo de cadena de frío. El tenant activo se deduce
-    de la autenticación y la membresía; nunca se acepta tenant_id del cliente.
+    API multi-tenant de telemetría IoT (monitoreo de cadena de frío como vertical insignia).
+    El tenant activo se deduce de la autenticación y la membresía; nunca se acepta tenant_id del cliente.
 servers:
   - url: http://localhost:3000/api
     description: Local (spec 000; sin versionado todavía, se evalúa en specs futuros)

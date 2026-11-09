@@ -1,7 +1,7 @@
 export function App() {
   return (
     <main>
-      <h1>ColdChain Telemetry Platform</h1>
+      <h1>TEIOT</h1>
     </main>
   );
 }
