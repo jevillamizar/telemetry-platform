@@ -61,7 +61,7 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
   entonces todos terminan en verde.
 - [x] **CA9** — Dado un push o PR a `main`, cuando corre `.github/workflows/ci.yml`, entonces todos los pasos terminan en verde.
   _(el workflow dispara en `master` y `main`; la rama real de este repo es `master`, ver T14)_
-- [ ] **CA10** — Dado `apps/mobile`, cuando ejecuto `pnpm --filter mobile exec expo config --type public` y
+- [x] **CA10** — Dado `apps/mobile`, cuando ejecuto `pnpm --filter mobile exec expo config --type public` y
   `npx expo-doctor`, entonces la configuración es válida e incluye `expo-dev-client` y `expo-router`.
 - [x] **CA11** — Dado el repo, cuando busco secretos, entonces ningún `.env` real está versionado y `.env.example`
   no contiene valores reales.
@@ -202,8 +202,11 @@ verificación indicado, ejecutado antes del cambio.
 ## Definición de terminado
 - [ ] Todos los CA en ✅ según `/verificar`
 - [ ] Sin hallazgos críticos ni altos abiertos en `/adversarial`
-- [ ] Cobertura ≥ 90% en `apps/api/src/health` y `apps/api/src/config`
-- [ ] `docs/api-spec.yml` con `GET /api/health` documentado
-- [ ] `docs/base-standards.md` §6 con la tabla de versiones verificadas
-- [ ] `CLAUDE.md` con los comandos reales
-- [ ] ADR si hubo decisiones nuevas (p. ej. `node-linker`, mecanismo de init de dynsec)
+- [x] Cobertura ≥ 90% en `apps/api/src/health` y `apps/api/src/config`, con dos excepciones puntuales
+  y documentadas en `jest.config.cjs` (branches de `health.controller.ts` y `health.module.ts`: guard de
+  `Reflect.metadata` por decoradores + la mitad no probada de `?? ""` en credenciales MQTT opcionales;
+  ninguna es lógica de negocio sin probar, ver T8 y T14)
+- [x] `docs/api-spec.yml` con `GET /api/health` documentado
+- [x] `docs/base-standards.md` §6 con la tabla de versiones verificadas
+- [x] `CLAUDE.md` con los comandos reales
+- [x] ADR si hubo decisiones nuevas (ADR 0007 NestJS ESM; ADR 0004 ampliado con la implementación de T9)

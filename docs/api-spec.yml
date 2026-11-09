@@ -7,12 +7,35 @@ info:
     API multi-tenant de monitoreo de cadena de frío. El tenant activo se deduce
     de la autenticación y la membresía; nunca se acepta tenant_id del cliente.
 servers:
-  - url: http://localhost:3000/api/v1
-    description: Local (no validado)
+  - url: http://localhost:3000/api
+    description: Local (spec 000; sin versionado todavía, se evalúa en specs futuros)
 security:
   - bearerAuth: []
-tags: []
-paths: {}
+tags:
+  - name: health
+    description: Estado de la plataforma, sin autenticación.
+paths:
+  /health:
+    get:
+      tags: [health]
+      summary: Estado de Postgres, Redis y Mosquitto
+      description: >
+        Sin autenticación. 200 si las tres dependencias están arriba, 503 si alguna está caída.
+        El cuerpo nunca expone mensajes de error internos ni credenciales (ver CA7).
+      security: []
+      responses:
+        "200":
+          description: Las tres dependencias están arriba.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+        "503":
+          description: Al menos una dependencia está caída.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
 components:
   securitySchemes:
     bearerAuth:
@@ -25,6 +48,20 @@ components:
       scheme: bearer
       description: Credencial de dispositivo para ingesta HTTP. El servidor deduce tenant y dispositivo.
   schemas:
+    HealthStatus:
+      type: object
+      required: [status, checks]
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+        checks:
+          type: object
+          required: [postgres, redis, mqtt]
+          properties:
+            postgres: { type: string, enum: [up, down] }
+            redis: { type: string, enum: [up, down] }
+            mqtt: { type: string, enum: [up, down] }
     Error:
       type: object
       required: [statusCode, error, message, requestId]
