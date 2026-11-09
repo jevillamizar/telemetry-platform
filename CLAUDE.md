@@ -24,12 +24,21 @@ Docs, specs, comentarios y commits en español. Identificadores, módulos y ruta
 `/enriquecer` → `/spec` → `/implementar` (una tarea a la vez) → `/verificar` → `/adversarial` → `/cerrar`
 
 ## Comandos del proyecto
-> ⚠️ **No validados todavía.** Se definen en el spec 000; no existe `package.json` aún.
-> Requisitos: Node 22.22.3, pnpm 10.20.0 (vía corepack), Docker Compose.
+> Validados en spec 000 (T1-T14). Requisitos: Node 22.22.3, pnpm 10.20.0 (vía corepack), Docker Compose.
 
-| Acción | Comando (previsto) |
+| Acción | Comando |
 |---|---|
 | Instalar | `pnpm install` |
-| Infra local | `docker compose up -d` |
-| Tests API | `pnpm --filter api test` |
-| E2E web | `pnpm --filter web test:e2e` |
+| Infra local (Postgres, Redis, Mosquitto, API) | `docker compose up -d --wait` (copiar `.env.example` → `.env` antes) |
+| Lint (monorepo) | `pnpm -r lint` |
+| Typecheck (monorepo) | `pnpm -r typecheck` |
+| Tests (monorepo) | `pnpm -r test` |
+| Build (monorepo) | `pnpm -r build` |
+| Tests API (unit + e2e, requiere infra local arriba) | `pnpm --filter api test` |
+| E2E web (Playwright) | `pnpm --filter web test:e2e` |
+| Validar config de mobile | `pnpm --filter mobile exec expo config --type public`<br>`pnpm --filter mobile exec expo-doctor` |
+
+Los e2e de `apps/api` necesitan `DATABASE_URL`, `REDIS_URL`, `MQTT_URL`, `MQTT_SERVICE_USERNAME` y
+`MQTT_SERVICE_PASSWORD` apuntando a la infra real (`apps/api/test/setup-env.cjs` trae valores por
+defecto para los puertos estándar; si tu `.env` local los cambia —p. ej. por un conflicto de puerto—
+exporta las variables correspondientes antes de correr los tests).

@@ -166,7 +166,7 @@ verificación indicado, ejecutado antes del cambio.
   real) → 503. Esto corrió el umbral de cobertura de `health.module.ts` de 80% a 66.66% en "branches"
   (el otro `?? ""` de las credenciales MQTT opcionales, antes nunca se probaba con valor presente, ahora
   nunca se prueba con valor ausente); ajustado en `jest.config.cjs` con la misma justificación que T8._
-- [ ] **T15** — Actualizar la sección de comandos de `CLAUDE.md` con los comandos reales verificados (quitar "no validados").
+- [x] **T15** — Actualizar la sección de comandos de `CLAUDE.md` con los comandos reales verificados (quitar "no validados").
   Cubre CA8.
 
 ## Casos borde
