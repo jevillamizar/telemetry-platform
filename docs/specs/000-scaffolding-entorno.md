@@ -117,8 +117,13 @@ verificación indicado, ejecutado antes del cambio.
   tres checks en `up` (CA6, pendiente desde T8) y 503 al detener Redis (CA7). Bug encontrado y corregido:
   `tsc` compilaba a `dist/src/main.js` en vez de `dist/main.js` e incluía los `*.spec.ts`; se agregó
   `apps/api/tsconfig.build.json` (rootDir `src`, excluye specs) y se ajustó el script `build`._
-- [ ] **T11** — `apps/web` mínimo: Vite + React + TS, `src/App.tsx` → `App` con el título del producto, test Vitest rojo
+- [x] **T11** — `apps/web` mínimo: Vite + React + TS, `src/App.tsx` → `App` con el título del producto, test Vitest rojo
   `src/App.test.tsx`, `playwright.config.ts` y `e2e/smoke.spec.ts` (la página carga). Cubre CA8.
+  _Se usa `happy-dom` en vez de `jsdom` como entorno de Vitest: `jsdom@31` arrastra `undici@8.12.4`, cuyo
+  interceptor de decompresión rompe con `TypeError: Cannot read properties of undefined (reading 'bind')`
+  al cargar en el worker de Vitest (bug de esa versión de undici, no de este proyecto). `happy-dom` no
+  depende de `undici` y es más liviano para un smoke test. Verificado: `pnpm -r lint/typecheck/test/build`
+  en verde (apps/api + apps/web) y `pnpm test:e2e` (Playwright/Chromium) en verde._
 - [ ] **T12** — `apps/mobile` mínimo: Expo SDK verificado en T1, Expo Router (`app/_layout.tsx`, `app/index.tsx`),
   `expo-dev-client`, `app.json` (Android primero, `scheme`, `android.package`), `eas.json` con perfil `development`
   (`developmentClient: true`, `distribution: internal`), test de humo con React Native Testing Library. Sin build en la nube.

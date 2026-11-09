@@ -86,7 +86,10 @@ en los `package.json` correspondientes.
 | react, react-dom | 19.3.1 | UI |
 | vite | 8.3.6 | build/dev server |
 | @vitejs/plugin-react | 6.2.1 | plugin React para Vite |
-| vitest | 5.1.0 | unit tests |
+| vitest | 5.1.0 | unit tests, entorno `happy-dom` (ver T11) |
+| happy-dom | 21.0.4 | entorno DOM para vitest (no `jsdom`: ver nota T11) |
+| @testing-library/react | 16.3.3 | render de componentes en tests |
+| @types/react, @types/react-dom | 19.3.0 | tipos |
 | @playwright/test | 1.65.0 | e2e |
 | **apps/mobile** (Expo SDK 58) | | |
 | expo | 58.0.23 | framework |
