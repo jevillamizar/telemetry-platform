@@ -1,0 +1,122 @@
+name: CI
+
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    env:
+      DATABASE_URL: postgresql://coldchain:coldchain@localhost:5432/coldchain
+      REDIS_URL: redis://localhost:6379
+      MQTT_URL: mqtt://localhost:1883
+      MQTT_SERVICE_USERNAME: api-service
+      MQTT_SERVICE_PASSWORD: ci-service-secret
+
+    services:
+      postgres:
+        image: postgres:16.15
+        env:
+          POSTGRES_USER: coldchain
+          POSTGRES_PASSWORD: coldchain
+          POSTGRES_DB: coldchain
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U coldchain"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+      redis:
+        image: redis:8.10.3-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Node (versión de .nvmrc)
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+
+      - name: Activar pnpm vía corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@10.20.0 --activate
+
+      - name: Resolver ruta del store de pnpm
+        id: pnpm-cache
+        run: echo "STORE_PATH=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+      - name: Caché de pnpm
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Levantar Mosquitto (Dynamic Security)
+        run: |
+          docker run -d --name mosquitto \
+            -p 1883:1883 \
+            -v "${{ github.workspace }}/infra/mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf" \
+            -v "${{ github.workspace }}/infra/mosquitto/init-dynsec.sh:/mosquitto/config/init-dynsec.sh" \
+            -e MOSQUITTO_ADMIN_USERNAME=admin \
+            -e MOSQUITTO_ADMIN_PASSWORD=ci-admin-secret \
+            -e MQTT_SERVICE_USERNAME="$MQTT_SERVICE_USERNAME" \
+            -e MQTT_SERVICE_PASSWORD="$MQTT_SERVICE_PASSWORD" \
+            eclipse-mosquitto:2.0.22 sh /mosquitto/config/init-dynsec.sh
+
+      - name: Esperar a que Mosquitto esté listo
+        run: |
+          for i in $(seq 1 30); do
+            docker run --rm --network host eclipse-mosquitto:2.0.22 \
+              mosquitto_sub -h 127.0.0.1 -p 1883 -u "$MQTT_SERVICE_USERNAME" -P "$MQTT_SERVICE_PASSWORD" \
+              -t "devices/+/telemetry" -C 1 -W 1 >/dev/null 2>&1
+            codigo=$?
+            if [ "$codigo" = "0" ] || [ "$codigo" = "27" ]; then
+              echo "Mosquitto listo."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Mosquitto no respondió a tiempo." >&2
+          exit 1
+
+      - name: Lint
+        run: pnpm -r lint
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      - name: Instalar navegador Chromium (Playwright)
+        run: pnpm --filter web exec playwright install --with-deps chromium
+
+      - name: Test (unit + integración)
+        run: pnpm -r test
+
+      - name: Test e2e web (Playwright)
+        run: pnpm --filter web test:e2e
+
+      - name: Build
+        run: pnpm -r build
+
+      - name: Detener Mosquitto
+        if: always()
+        run: docker rm -f mosquitto || true

@@ -59,7 +59,8 @@ para implementar los specs 001–006 sobre una base verificada y no sobre supues
   `503` con `status: "error"` y esa dependencia en `"down"`, sin filtrar mensajes internos ni credenciales.
 - [x] **CA8** — Dado el monorepo, cuando ejecuto `pnpm -r lint`, `pnpm -r typecheck`, `pnpm -r test` y `pnpm -r build`,
   entonces todos terminan en verde.
-- [ ] **CA9** — Dado un push o PR a `main`, cuando corre `.github/workflows/ci.yml`, entonces todos los pasos terminan en verde.
+- [x] **CA9** — Dado un push o PR a `main`, cuando corre `.github/workflows/ci.yml`, entonces todos los pasos terminan en verde.
+  _(el workflow dispara en `master` y `main`; la rama real de este repo es `master`, ver T14)_
 - [ ] **CA10** — Dado `apps/mobile`, cuando ejecuto `pnpm --filter mobile exec expo config --type public` y
   `npx expo-doctor`, entonces la configuración es válida e incluye `expo-dev-client` y `expo-router`.
 - [x] **CA11** — Dado el repo, cuando busco secretos, entonces ningún `.env` real está versionado y `.env.example`
@@ -145,10 +146,26 @@ verificación indicado, ejecutado antes del cambio.
   `MQTT_URL`; sin esa variable termina con `exitCode 1` y un mensaje que no imprime valores, solo el
   nombre de la variable faltante. Sin hallazgos de entorno esta vez: instalación, lint, typecheck,
   test (Vitest) y build en verde en el primer intento._
-- [ ] **T14** — `.github/workflows/ci.yml`: `ubuntu-latest`, `actions/setup-node` con `node-version-file: .nvmrc`,
+- [x] **T14** — `.github/workflows/ci.yml`: `ubuntu-latest`, `actions/setup-node` con `node-version-file: .nvmrc`,
   `corepack enable`, caché de pnpm, `pnpm install --frozen-lockfile`, lint, typecheck, test (con `services:` Postgres 16
   y Redis, y Mosquitto como contenedor con la config de `infra/`) y build. Playwright con navegador Chromium.
   Cubre CA9.
+  _Hallazgos: (1) el trigger usa `[master, main]` — la rama real del repo sigue siendo `master` (T0 dejó el
+  rename a `main` como opcional y nunca se hizo); usar solo `main` como decía el texto original del spec
+  habría dejado el workflow sin disparar nunca. (2) Mosquitto no puede ir en el bloque declarativo
+  `services:` de GitHub Actions porque ese bloque no permite sobreescribir el `command`/entrypoint de la
+  imagen (necesitamos `sh /mosquitto/config/init-dynsec.sh` en vez del `CMD` por defecto); se levanta con
+  un paso `docker run` normal + un paso de espera que reutiliza la misma lógica de "healthcheck con el
+  cliente de servicio" de T10. (3) Al preparar el e2e para CI con Mosquitto real y credenciales reales,
+  encontré que `test/health.e2e-spec.ts` (de T8) siempre pasaba por la razón equivocada: nunca se
+  configuraban `MQTT_SERVICE_USERNAME/PASSWORD` en el test, así que mqtt quedaba "down" por credenciales
+  vacías rechazadas, no porque Mosquitto no existiera (ya existe desde T9). Lo reescribí con dos casos:
+  las tres dependencias reales arriba con credenciales válidas → 200 (cierra la automatización de CA6,
+  antes solo verificada a mano con curl en T10), y Redis inalcanzable simulado vía `ConfigService`
+  sobreescrito en el propio test (no un `REDIS_CLIENT` con URL mala, para no perder cobertura del factory
+  real) → 503. Esto corrió el umbral de cobertura de `health.module.ts` de 80% a 66.66% en "branches"
+  (el otro `?? ""` de las credenciales MQTT opcionales, antes nunca se probaba con valor presente, ahora
+  nunca se prueba con valor ausente); ajustado en `jest.config.cjs` con la misma justificación que T8._
 - [ ] **T15** — Actualizar la sección de comandos de `CLAUDE.md` con los comandos reales verificados (quitar "no validados").
   Cubre CA8.
 
